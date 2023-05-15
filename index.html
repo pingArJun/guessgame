@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Guessing Game</title>
+  </head>
+  <body>
+    <h1>Guessing Game</h1>
+    <p>Use your voice or the input box below to guess the secret number between 1 and 100.</p>
+    <input type="number" id="guess" min="1" max="100">
+    <button id="submit">Submit</button>
+    <p id="message"></p>
+
+    <script>
+      // Set up speech recognition
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const recognition = new SpeechRecognition();
+      recognition.continuous = true;
+      recognition.interimResults = false;
+
+      // Generate a random secret number
+      const secretNumber = Math.floor(Math.random() * 100) + 1;
+
+      // Get references to the input elements
+      const guessInput = document.getElementById("guess");
+      const submitButton = document.getElementById("submit");
+      const message = document.getElementById("message");
+
+      // Handle voice commands
+      recognition.onresult = function(event) {
+        const transcript = event.results[event.resultIndex][0].transcript.trim().toLowerCase();
+        const guess = parseInt(transcript);
+        checkGuess(guess);
+      };
+
+      // Handle button clicks
+      submitButton.addEventListener("click", function() {
+        const guess = parseInt(guessInput.value);
+        checkGuess(guess);
+      });
+
+      // Check the user's guess
+      function checkGuess(guess) {
+        let messageText;
+        if (isNaN(guess)) {
+          messageText = "Please enter a number between 1 and 100.";
+        } else if (guess < secretNumber) {
+          messageText = "Your guess is too low. Try again.";
+        } else if (guess > secretNumber) {
+          messageText = "Your guess is too high. Try again.";
+        } else {
+          messageText = "Congratulations! You guessed the secret number.";
+        }
+        message.textContent = messageText;
+        speak(messageText);
+      }
+
+      // Speak the text using speech synthesis
+      function speak(text) {
+        const synth = window.speechSynthesis;
+        const utterance = new SpeechSynthesisUtterance(text);
+        synth.speak(utterance);
+      }
+
+      // Start speech recognition
+      recognition.start();
+    </script>
+  </body>
+</html>
